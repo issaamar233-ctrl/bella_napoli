@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bella Napoli - نظام إدارة المطعم</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --crimson: #C0152A;
+  --crimson-dark: #8B0F1E;
+  --crimson-light: #E8192F;
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --charcoal: #1A1A1A;
+  --warm-white: #FAFAF8;
+  --cream: #F5F0E8;
+  --gray-soft: #6B6B6B;
+  --gray-light: #E8E4DC;
+  --success: #2E7D4F;
+  --warning: #B8860B;
+  --info: #1565C0;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 40px rgba(0,0,0,0.12);
+  --shadow-lg: 0 16px 60px rgba(0,0,0,0.16);
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--warm-white);
+  color: var(--charcoal);
+  min-height: 100vh;
+}
+
+/* ===== VIEWS ===== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== NAV BAR ===== */
+#main-nav {
+  background: var(--charcoal);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+}
+.nav-tab {
+  color: #AAA;
+  background: none;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.nav-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+.nav-tab.active { color: var(--gold); background: rgba(201,168,76,0.15); }
+.nav-badge {
+  background: var(--crimson);
+  color: white;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 11px;
+  margin-right: 4px;
+  min-width: 18px;
+  display: inline-block;
+  text-align: center;
+}
+
+/* ===== CUSTOMER MENU VIEW ===== */
+#menu-hero {
+  background: linear-gradient(135deg, var(--charcoal) 0%, #2A0A10 50%, var(--crimson-dark) 100%);
+  padding: 40px 20px 50px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+#menu-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-logo {
+  font-family: 'Playfair Display', serif;
+  color: white;
+  font-size: clamp(32px, 8vw, 56px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 3px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+.hero-logo span { color: var(--gold); }
+.hero-tagline {
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  margin-top: 8px;
+  letter-spacing: 2px;
+}
+.hero-address {
+  color: var(--gold-light);
+  font-size: 13px;
+  margin-top: 16px;
+  opacity: 0.9;
+}
+.hero-table-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--charcoal);
+  font-weight: 700;
+  padding: 8px 24px;
+  border-radius: 30px;
+  margin-top: 20px;
+  font-size: 15px;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.4);
+}
+
+.special-offer-banner {
+  background: linear-gradient(90deg, var(--crimson), var(--crimson-dark));
+  color: white;
+  padding: 12px 20px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Category tabs */
+.category-nav {
+  background: white;
+  border-bottom: 2px solid var(--gray-light);
+  position: sticky;
+  top: 56px;
+  z-index: 900;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.category-nav::-webkit-scrollbar { display: none; }
+.category-tabs {
+  display: flex;
+  padding: 0 12px;
+  gap: 4px;
+  min-width: max-content;
+}
+.cat-tab {
+  padding: 14px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-soft);
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cat-tab:hover { color: var(--crimson); }
+.cat-tab.active { color: var(--crimson); border-bottom-color: var(--crimson); }
+
+/* Menu sections */
+.menu-container { padding: 20px 16px 120px; max-width: 900px; margin: 0 auto; }
+.menu-section { margin-bottom: 36px; }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.section-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(192,21,42,0.3);
+}
+.section-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--charcoal);
+}
+.section-divider {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(to left, transparent, var(--gray-light));
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.menu-item {
+  background: white;
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-light);
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+.menu-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(192,21,42,0.2);
+}
+.menu-item.unavailable { opacity: 0.5; pointer-events: none; }
+
+.item-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 6px;
+}
+.item-desc {
+  font-size: 12px;
+  color: var(--gray-soft);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.item-price {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--crimson);
+}
+.item-price span { font-size: 12px; font-weight: 400; color: var(--gray-soft); }
+.add-btn {
+  background: var(--crimson);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.add-btn:hover { background: var(--crimson-dark); }
+.item-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--gold);
+  color: var(--charcoal);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+/* Cart */
+.cart-fab {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--crimson);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 32px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(192,21,42,0.5);
+  display: none;
+  align-items: center;
+  gap: 10px;
+  z-index: 800;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.cart-fab:hover { background: var(--crimson-dark); transform: translateX(-50%) translateY(-2px); }
+.cart-fab.visible { display: flex; }
+.cart-count-badge {
+  background: white;
+  color: var(--crimson);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+/* Cart panel */
+#cart-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+  z-index: 2000;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#cart-panel.open { transform: translateY(0); }
+.cart-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--gray-light);
+  border-radius: 2px;
+  margin: 14px auto 0;
+  flex-shrink: 0;
+}
+.cart-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.cart-title { font-size: 18px; font-weight: 900; }
+.cart-close {
+  background: var(--gray-light);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cart-items { overflow-y: auto; flex: 1; padding: 12px 20px; }
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-light);
+}
+.cart-item-name { font-size: 14px; font-weight: 600; flex: 1; }
+.cart-item-note {
+  font-size: 11px;
+  color: var(--gray-soft);
+  margin-top: 2px;
+}
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cream);
+  border-radius: 20px;
+  padding: 4px 8px;
+}
+.qty-btn {
+  background: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--crimson);
+  font-weight: 900;
+}
+.qty-num { font-weight: 700; min-width: 20px; text-align: center; }
+.cart-item-price { font-weight: 700; color: var(--crimson); min-width: 50px; text-align: left; }
+.note-btn {
+  background: none;
+  border: 1px dashed var(--gray-light);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--gray-soft);
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  margin-top: 4px;
+}
+.cart-footer {
+  padding: 16px 20px;
+  border-top: 2px solid var(--gray-light);
+  flex-shrink: 0;
+}
+.cart-totals { margin-bottom: 14px; }
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+}
+.total-row.grand {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--crimson);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-light);
+}
+.order-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 16px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(192,21,42,0.4);
+  transition: all 0.2s;
+}
+.order-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1999;
+  display: none;
+}
+.cart-overlay.visible { display: block; }
+
+/* Note modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.visible { display: flex; }
+.modal-box {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+}
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.modal-input {
+  width: 100%;
+  border: 2px solid var(--gray-light);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s;
+  text-align: right;
+}
+.modal-input:focus { border-color: var(--crimson); }
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.modal-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+}
+.modal-btn.primary { background: var(--crimson); color: white; }
+.modal-btn.secondary { background: var(--cream); color: var(--charcoal); }
+
+/* Order success */
+#order-success {
+  position: fixed;
+  inset: 0;
+  background: white;
+  z-index: 5000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+#order-success.show { display: flex; }
+.success-icon {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, var(--success), #1B5E33);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin-bottom: 24px;
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.success-title { font-size: 26px; font-weight: 900; margin-bottom: 10px; }
+.success-msg { color: var(--gray-soft); font-size: 15px; line-height: 1.6; max-width: 300px; }
+.success-number { font-size: 48px; font-weight: 900; color: var(--crimson); margin: 20px 0; }
+.success-back {
+  background: var(--crimson);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 14px 32px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* Social links */
+.social-bar {
+  background: var(--charcoal);
+  padding: 20px 16px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  transition: all 0.2s;
+}
+.social-link:hover { opacity: 0.8; transform: translateY(-1px); }
+.social-link.whatsapp { background: #25D366; }
+.social-link.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.social-link.facebook { background: #1877F2; }
+.social-link.phone { background: var(--crimson); }
+.social-link.maps { background: #4285F4; }
+
+/* ===== ADMIN VIEWS ===== */
+.admin-content { padding: 20px 16px; max-width: 1100px; margin: 0 auto; }
+.page-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Orders list */
+.orders-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 8px 16px;
+  border: 2px solid var(--gray-light);
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  color: var(--gray-soft);
+}
+.filter-btn:hover, .filter-btn.active { border-color: var(--crimson); color: var(--crimson); background: rgba(192,21,42,0.05); }
+
+.order-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  border: 2px solid var(--gray-light);
+  border-right: 5px solid var(--gray-light);
+  transition: all 0.2s;
+}
+.order-card.status-new { border-right-color: var(--crimson); }
+.order-card.status-preparing { border-right-color: var(--warning); }
+.order-card.status-ready { border-right-color: var(--success); }
+.order-card.status-delivered { border-right-color: var(--info); }
+.order-card.status-cancelled { border-right-color: var(--gray-soft); opacity: 0.6; }
+
+.order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.order-id { font-size: 16px; font-weight: 900; }
+.order-meta { font-size: 12px; color: var(--gray-soft); }
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.status-badge.new { background: rgba(192,21,42,0.1); color: var(--crimson); }
+.status-badge.preparing { background: rgba(184,134,11,0.1); color: var(--warning); }
+.status-badge.ready { background: rgba(46,125,79,0.1); color: var(--success); }
+.status-badge.delivered { background: rgba(21,101,192,0.1); color: var(--info); }
+.status-badge.cancelled { background: rgba(107,107,107,0.1); color: var(--gray-soft); }
+
+.order-items-list { margin-bottom: 12px; }
+.order-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+  border-bottom: 1px dashed var(--gray-light);
+}
+.order-line:last-child { border: none; }
+.order-note-line { font-size: 11px; color: var(--gold); margin-top: 1px; }
+.order-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 900;
+  font-size: 15px;
+  padding-top: 8px;
+  border-top: 2px solid var(--gray-light);
+}
+.order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.action-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.action-btn.accept { background: var(--success); color: white; }
+.action-btn.reject { background: var(--crimson); color: white; }
+.action-btn.preparing { background: var(--warning); color: white; }
+.action-btn.ready { background: var(--success); color: white; }
+.action-btn.deliver { background: var(--info); color: white; }
+.action-btn.print { background: var(--charcoal); color: white; }
+.action-btn.invoice { background: var(--gold); color: var(--charcoal); }
+.action-btn:hover { opacity: 0.85; }
+
+/* Notification bell */
+.notif-pulse {
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--crimson);
+  text-align: center;
+}
+.stat-card.gold { border-top-color: var(--gold); }
+.stat-card.green { border-top-color: var(--success); }
+.stat-card.blue { border-top-color: var(--info); }
+.stat-value { font-size: 32px; font-weight: 900; color: var(--charcoal); }
+.stat-label { font-size: 12px; color: var(--gray-soft); margin-top: 4px; }
+
+.chart-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.chart-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+.bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar {
+  width: 100%;
+  background: linear-gradient(to top, var(--crimson), var(--crimson-light));
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.6s ease;
+}
+.bar-label { font-size: 10px; color: var(--gray-soft); text-align: center; }
+.top-items-list .top-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-light);
+}
+.top-item-rank {
+  width: 28px;
+  height: 28px;
+  background: var(--cream);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--crimson);
+  flex-shrink: 0;
+}
+.top-item-name { flex: 1; font-size: 13px; font-weight: 600; }
+.top-item-count { font-size: 13px; color: var(--gray-soft); }
+
+/* Menu Management */
+.menu-mgmt-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 16px;
+  border: 2px solid var(--gray-light);
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  outline: none;
+  text-align: right;
+}
+.search-input:focus { border-color: var(--crimson); }
+.primary-btn {
+  background: var(--crimson);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.primary-btn:hover { background: var(--crimson-dark); }
+
+.mgmt-item {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+.mgmt-item:hover { box-shadow: var(--shadow-md); }
+.mgmt-item-info { flex: 1; }
+.mgmt-item-name { font-size: 14px; font-weight: 700; }
+.mgmt-item-cat { font-size: 11px; color: var(--gray-soft); margin-top: 2px; }
+.mgmt-item-price { font-size: 15px; font-weight: 900; color: var(--crimson); min-width: 60px; text-align: center; }
+.mgmt-actions { display: flex; gap: 6px; }
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.icon-btn.edit { background: rgba(184,134,11,0.1); color: var(--warning); }
+.icon-btn.del { background: rgba(192,21,42,0.1); color: var(--crimson); }
+.icon-btn.toggle { background: rgba(46,125,79,0.1); color: var(--success); }
+.icon-btn:hover { opacity: 0.7; }
+.availability-toggle {
+  width: 40px;
+  height: 22px;
+  background: var(--gray-light);
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: none;
+}
+.availability-toggle.on { background: var(--success); }
+.availability-toggle::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: left 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.availability-toggle.on::after { left: 20px; }
+
+/* QR View */
+.qr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.qr-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  border: 2px solid var(--gray-light);
+  transition: all 0.2s;
+}
+.qr-card:hover { border-color: var(--crimson); box-shadow: var(--shadow-md); }
+.qr-table-num { font-size: 20px; font-weight: 900; margin-bottom: 14px; color: var(--charcoal); }
+.qr-code-area { display: flex; justify-content: center; margin-bottom: 14px; }
+.qr-link { font-size: 11px; color: var(--gray-soft); word-break: break-all; margin-bottom: 12px; }
+.qr-download {
+  width: 100%;
+  padding: 8px;
+  background: var(--cream);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--charcoal);
+  transition: all 0.2s;
+}
+.qr-download:hover { background: var(--gray-light); }
+
+/* Invoice */
+#invoice-modal .modal-box { max-width: 380px; }
+.invoice-header { text-align: center; margin-bottom: 20px; }
+.invoice-logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--crimson);
+}
+.invoice-divider { border: none; border-top: 1px dashed var(--gray-light); margin: 10px 0; }
+.invoice-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+}
+.invoice-total { font-size: 16px; font-weight: 900; }
+.invoice-qr { display: flex; justify-content: center; margin: 14px 0; }
+.print-invoice-btn {
+  width: 100%;
+  background: var(--charcoal);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+/* Edit item modal */
+#edit-modal .modal-box { max-width: 480px; max-height: 90vh; overflow-y: auto; }
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; margin-bottom: 6px; display: block; color: var(--gray-soft); }
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--gray-light);
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  outline: none;
+  text-align: right;
+}
+.form-input:focus { border-color: var(--crimson); }
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--gray-light);
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  outline: none;
+  background: white;
+  text-align: right;
+}
+.form-select:focus { border-color: var(--crimson); }
+
+/* Print styles */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: fixed; top: 0; left: 0; width: 80mm; font-family: monospace; font-size: 12px; }
+}
+
+/* Login */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--charcoal);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-box {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+.login-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--crimson);
+  margin-bottom: 8px;
+}
+.login-subtitle { color: var(--gray-soft); font-size: 13px; margin-bottom: 32px; }
+.login-field {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid var(--gray-light);
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  margin-bottom: 12px;
+  outline: none;
+  text-align: center;
+}
+.login-field:focus { border-color: var(--crimson); }
+.login-btn {
+  width: 100%;
+  background: var(--crimson);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: var(--radius);
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(192,21,42,0.4);
+  margin-top: 4px;
+}
+.login-error { color: var(--crimson); font-size: 13px; margin-top: 8px; display: none; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .nav-tabs { gap: 2px; }
+  .nav-tab { padding: 8px 8px; font-size: 12px; }
+  .menu-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Toast notification */
+#toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--charcoal);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9000;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Discount badge */
+.discount-price { text-decoration: line-through; color: var(--gray-soft); font-size: 12px; margin-left: 6px; }
+
+/* Loading dots */
+.dot-loading::after {
+  content: '...';
+  animation: dots 1.5s infinite;
+}
+@keyframes dots {
+  0%, 100% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Bella Napoli</div>
+    <div class="login-subtitle">لوحة إدارة النظام</div>
+    <input type="text" class="login-field" id="login-user" placeholder="اسم المستخدم" value="admin">
+    <input type="password" class="login-field" id="login-pass" placeholder="كلمة المرور" value="">
+    <button class="login-btn" onclick="doLogin()">دخول</button>
+    <div class="login-error" id="login-error">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+    <div style="margin-top:20px; font-size:12px; color:var(--gray-soft);">
+      للمعاينة: admin / 1234
+    </div>
+  </div>
+</div>
+
+<!-- MAIN NAV -->
+<nav id="main-nav" style="display:none">
+  <div class="nav-logo">Bella Napoli</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('menu')">🍕 القائمة</button>
+    <button class="nav-tab" onclick="showView('orders')">
+      📋 الطلبات <span class="nav-badge" id="new-orders-count">0</span>
+    </button>
+    <button class="nav-tab" onclick="showView('stats')">📊 إحصائيات</button>
+    <button class="nav-tab" onclick="showView('mgmt')">⚙️ إدارة</button>
+    <button class="nav-tab" onclick="showView('qr')">📱 QR</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ========== VIEW: MENU ========== -->
+<div id="view-menu" class="view active">
+  <div id="menu-hero">
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px">
+      <div style="width:70px;height:70px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.3);flex-shrink:0">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--crimson);line-height:1;text-align:center">BN</div>
+      </div>
+      <div class="hero-logo">BELLA<br><span>NAPOLI</span></div>
+    </div>
+    <div class="hero-tagline">مطعم إيطالي أصيل · Authentic Italian</div>
+    <div class="hero-address">📍 شارع رفيديا الرئيسي، تحت مفرق شارع 15 &nbsp;|&nbsp; 📞 0597 460001</div>
+    <div class="hero-table-badge" id="table-badge" style="display:none">🪑 طاولة رقم <span id="table-num-display">—</span></div>
+  </div>
+
+  <div class="special-offer-banner">
+    🔥 عرض اليوم: باستا + سلطة بخصم 15% &nbsp;|&nbsp; نهاية سعيدة: تيراميسو بـ 18 شيكل فقط
+  </div>
+
+  <nav class="category-nav">
+    <div class="category-tabs" id="cat-tabs"></div>
+  </nav>
+
+  <div class="menu-container" id="menu-container"></div>
+
+  <div class="social-bar">
+    <a class="social-link whatsapp" href="https://api.whatsapp.com/send?phone=972597460001" target="_blank">📱 واتساب</a>
+    <a class="social-link phone" href="tel:0597460001">📞 اتصال</a>
+    <a class="social-link instagram" href="https://www.instagram.com/bellanapolires?igsh=Mm1vbjlqdXl5NWhw" target="_blank">📸 انستغرام</a>
+    <a class="social-link facebook" href="https://www.facebook.com/share/18cdtkKp4N/" target="_blank">👤 فيسبوك</a>
+    <a class="social-link maps" href="https://maps.google.com/?q=Bella+Napoli+Nablus" target="_blank">🗺️ الموقع</a>
+  </div>
+</div>
+
+<!-- Cart FAB -->
+<button class="cart-fab" id="cart-fab" onclick="openCart()">
+  🛒 سلة الطلبات
+  <span class="cart-count-badge" id="cart-count-badge">0</span>
+  <span id="cart-total-fab">0 ₪</span>
+</button>
+
+<!-- Cart Overlay -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+
+<!-- Cart Panel -->
+<div id="cart-panel">
+  <div class="cart-handle"></div>
+  <div class="cart-header">
+    <div class="cart-title">🛒 سلة الطلبات</div>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-list"></div>
+  <div class="cart-footer">
+    <div class="cart-totals">
+      <div class="total-row"><span>المجموع الفرعي</span><span id="subtotal-val">0 ₪</span></div>
+      
+      <div class="total-row grand"><span>المجموع النهائي</span><span id="grand-total-val">0 ₪</span></div>
+    </div>
+    <button class="order-btn" onclick="submitOrder()">✅ إرسال الطلب</button>
+  </div>
+</div>
+
+<!-- Order Success -->
+<div id="order-success">
+  <div class="success-icon">✓</div>
+  <div class="success-title">تم إرسال طلبك!</div>
+  <div class="success-number" id="success-order-num">#001</div>
+  <div class="success-msg">طلبك في انتظار موافقة المطعم. سيصلك تأكيد قريباً. شكراً لاختيارك Bella Napoli!</div>
+  <button class="success-back" onclick="closeSuccess()">العودة للقائمة</button>
+</div>
+
+<!-- ========== VIEW: ORDERS ========== -->
+<div id="view-orders" class="view">
+  <div class="admin-content">
+    <div class="page-title">📋 إدارة الطلبات</div>
+    <div class="orders-filters">
+      <button class="filter-btn active" onclick="filterOrders('all',this)">الكل</button>
+      <button class="filter-btn" onclick="filterOrders('new',this)">جديد 🔴</button>
+      <button class="filter-btn" onclick="filterOrders('preparing',this)">قيد التحضير 🟡</button>
+      <button class="filter-btn" onclick="filterOrders('ready',this)">جاهز 🟢</button>
+      <button class="filter-btn" onclick="filterOrders('delivered',this)">تم التسليم 🔵</button>
+      <button class="filter-btn" onclick="filterOrders('cancelled',this)">ملغي ⚫</button>
+    </div>
+    <div id="orders-list"></div>
+  </div>
+</div>
+
+<!-- ========== VIEW: STATS ========== -->
+<div id="view-stats" class="view">
+  <div class="admin-content">
+    <div class="page-title">📊 الإحصائيات والتقارير</div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="chart-card">
+      <div class="chart-title">📈 الطلبات اليومية (آخر 7 أيام)</div>
+      <div class="bar-chart" id="daily-chart"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap;">
+      <div class="chart-card">
+        <div class="chart-title">🏆 أكثر الأصناف مبيعاً</div>
+        <div class="top-items-list" id="top-items"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">📦 مبيعات الأقسام</div>
+        <div class="top-items-list" id="top-cats"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+      <button class="primary-btn" onclick="exportExcel()">📥 تصدير Excel</button>
+      <button class="primary-btn" style="background:var(--charcoal)" onclick="exportPDF()">📄 تصدير PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VIEW: MGMT ========== -->
+<div id="view-mgmt" class="view">
+  <div class="admin-content">
+    <div class="page-title">⚙️ إدارة قائمة الطعام</div>
+    <div class="menu-mgmt-controls">
+      <input type="text" class="search-input" id="mgmt-search" placeholder="🔍 ابحث عن صنف..." oninput="renderMgmt()">
+      <select class="form-select" id="mgmt-cat-filter" style="width:auto;min-width:140px" onchange="renderMgmt()">
+        <option value="all">جميع الأقسام</option>
+      </select>
+      <button class="primary-btn" onclick="openAddItem()">+ إضافة صنف</button>
+    </div>
+    <div id="mgmt-list"></div>
+  </div>
+</div>
+
+<!-- ========== VIEW: QR ========== -->
+<div id="view-qr" class="view">
+  <div class="admin-content">
+    <div class="page-title">📱 رموز QR للطاولات</div>
+    <div id="qr-grid" class="qr-grid"></div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="note-modal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ إضافة ملاحظة</div>
+    <textarea class="modal-input" id="note-text" rows="3" placeholder="مثال: بدون بصل، إضافة صلصة..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="saveNote()">حفظ</button>
+      <button class="modal-btn secondary" onclick="closeModal('note-modal')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="invoice-modal">
+  <div class="modal-box" id="invoice-modal-box">
+    <div id="invoice-content"></div>
+    <button class="print-invoice-btn" onclick="printInvoice()">🖨️ طباعة الفاتورة</button>
+    <button class="modal-btn secondary" style="width:100%;margin-top:8px" onclick="closeModal('invoice-modal')">إغلاق</button>
+  </div>
+</div>
+
+<!-- EDIT ITEM MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="edit-modal-title">✏️ تعديل صنف</div>
+    <div class="form-group">
+      <label class="form-label">اسم الصنف</label>
+      <input type="text" class="form-input" id="edit-name" placeholder="اسم الصنف">
+    </div>
+    <div class="form-group">
+      <label class="form-label">القسم</label>
+      <select class="form-select" id="edit-cat"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">السعر (شيكل)</label>
+      <input type="number" class="form-input" id="edit-price" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">الوصف</label>
+      <textarea class="form-input" id="edit-desc" rows="2" placeholder="وصف الصنف..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">سعر ما بعد الخصم (اختياري)</label>
+      <input type="number" class="form-input" id="edit-sale" placeholder="0 = لا خصم">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="saveItem()">💾 حفظ</button>
+      <button class="modal-btn secondary" onclick="closeModal('edit-modal')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN PRINT AREA -->
+<div id="print-area" style="display:none"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const CATEGORIES = [
+  { id: 'pizza', name: 'البيتزا', icon: '🍕' },
+  { id: 'pasta', name: 'الباستا', icon: '🍝' },
+  { id: 'salads', name: 'السلطات', icon: '🥗' },
+  { id: 'starters', name: 'المقبلات', icon: '🧆' },
+  { id: 'soups', name: 'الشوربات', icon: '🍲' },
+  { id: 'mains', name: 'الوجبات الرئيسية', icon: '🍽️' },
+  { id: 'desserts', name: 'الحلويات', icon: '🍮' },
+  { id: 'drinks', name: 'المشروبات', icon: '☕' },
+];
+
+
+
+let MENU = [
+  // PIZZA
+  { id:1, cat:'pizza', name:'بيتزا نابوليتانا', desc:'صلصة طماطم طازجة، جبن البفلو الفرش، مصحوبة أوراق ريحان، زيت زيتون.', price:35, sale:null, available:true },
+  { id:2, cat:'pizza', name:'بيتزا بيانكا', desc:'صلصة كريما طازجة، جبنة الموتسريلا و الفطر الطازج والكمأ.', price:35, sale:null, available:true },
+  { id:3, cat:'pizza', name:'بيتزا سلامي', desc:'صلصة طماطم طازجة جبنة الموتسريلا، سلامي، شرائح الفلفل والبصل.', price:37, sale:null, available:true },
+  { id:4, cat:'pizza', name:'بيتزا بيلا', desc:'صلصة الريحان مع جبنة البورتا ألتو بيانو، مع أوراق جرجير، بندورة شيري مع البلسمك.', price:45, sale:null, available:true },
+  { id:5, cat:'pizza', name:'بيتزا خضار', desc:'صلصة طماطم طازجة، جبن البفلو مع الخضار الطازجة.', price:35, sale:null, available:true },
+  { id:6, cat:'pizza', name:'بيتزا سالمون', desc:'صلصة الريحان مع جبنة البفلو، سالمون مدخن، كيبرز بيبي جرين مع جبنة ريكوتا.', price:40, sale:null, available:true },
+  { id:7, cat:'pizza', name:'بيتزا روست بيف', desc:'صلصة طماطم طازجة، جبن البفلو مع هلابينو، شرائح بصل أحمر، أوراق ريحان.', price:40, sale:null, available:true },
+  // PASTA
+  { id:8, cat:'pasta', name:'فوتشيني الفريدو', desc:'باستا طازجة مغمورة في صوص كريمي غني بالبارميزان والجرونجوزيلا وزيت الترافيل والفطر.', price:30, sale:null, available:true },
+  { id:9, cat:'pasta', name:'بينا أرياتا', desc:'معكرونة بينا، صوص طماطم حارة من الفلفل الأحمر والثوم وزيت الزيتون.', price:30, sale:null, available:true },
+  { id:10, cat:'pasta', name:'اسباغتي جمبري', desc:'معكرونة ممزوجة بحر الجبار مصحوبة بصوص لليمون والبندورة والجمبري.', price:50, sale:null, available:true },
+  { id:11, cat:'pasta', name:'كلاسيك لازانيا', desc:'رقائق من لازنيا بصحوبة بصوص البولونيز، جبنة موتزريلا وزيت لاعشاب.', price:35, sale:null, available:true },
+  { id:12, cat:'pasta', name:'كانيلوني', desc:'اسطوانات كانيلوني محشية بجبنة الريكوتا والسبانخ وصوص الطماطم.', price:35, sale:null, available:true },
+  { id:13, cat:'pasta', name:'رفيولي', desc:'اختيار صوص: لليمون، صوص برمجان.', price:30, sale:null, available:true },
+  { id:14, cat:'pasta', name:'تورتاليني', desc:'فواكة بحر مصحوبة بصوص الكريما.', price:45, sale:null, available:true },
+  // SALADS
+  { id:15, cat:'salads', name:'بورتا سلط', desc:'جبنة الموتسريلا محشوة بكريم الجبن مصحوبة بأوراق الجرجير والفواكة الموسمية.', price:40, sale:null, available:true },
+  { id:16, cat:'salads', name:'سلطة البنزالينا', desc:'بندورة شيري، خيار، بصل أحمر، ريحان، خبز محمص، خل، بلسمك بجبنة الموتسريلا.', price:25, sale:null, available:true },
+  { id:17, cat:'salads', name:'سيزر سلط', desc:'أوراق خس بندورة شيري، خبز محمص، جبنة برمجانو أورجانو، ممزوجة بصوص بيلا.', price:20, sale:null, available:true },
+  { id:18, cat:'salads', name:'باستا بيلا سلط', desc:'باستا فارفيلا، أوراق خس، بندورة شيري، ذرة، زيتون كالماتا، بصل أحمر مصحوبة بجبنة فيتا.', price:20, sale:null, available:true },
+  { id:19, cat:'salads', name:'كينوا سلط', desc:'بذور الكينوا ممزوجة مع الشمندر والفواكة الموسمية وجبنة الفيتا.', price:25, sale:null, available:true },
+  // STARTERS
+  { id:20, cat:'starters', name:'أرنشيني (4 قطع)', desc:'فريكة ممزوجة بالكريمة وجبنة البرمجان ريجانو، مصحوبة بصوص الروزي وجبنة الماعز.', price:22, sale:null, available:true },
+  { id:21, cat:'starters', name:'بروشكتا', desc:'4 قطع خبز محمص، سالمون مدخن، مصحوبة بصوص البيستو، بندورة أوراق بيبي جرين والبرمجان ريجانو.', price:25, sale:null, available:true },
+  { id:22, cat:'starters', name:'كرباتشو بتنجان', desc:'باذنجان مشوي وكريم بتنجان مصحوب بطحنية مدخنة و دبس التمر والصنوبر.', price:20, sale:null, available:true },
+  { id:23, cat:'starters', name:'كلماري بيلا', desc:'كلماري مقلي مصحوب بلبنة بلدية مع زيت والأعشاب.', price:35, sale:null, available:true },
+  { id:24, cat:'starters', name:'فوكاتشا بارميجيانا', desc:'زيت زيتون، شيري، أعشاب، جبنة برمجان.', price:18, sale:null, available:true },
+  { id:25, cat:'starters', name:'بطاطا مقلية', desc:'بطاطا مقلية طازجة مقرمشة.', price:15, sale:null, available:true },
+  // SOUPS
+  { id:26, cat:'soups', name:'شوربة فواكة البحر بالكريما', desc:'شوربة غنية بفواكة البحر المتنوعة في صوص الكريما الإيطالي.', price:35, sale:null, available:true },
+  // MAINS
+  { id:27, cat:'mains', name:'سمك ليبراك', desc:'ليبراك مشوي مع الفريكة بالكريما.', price:60, sale:null, available:true },
+  { id:28, cat:'mains', name:'سالمون', desc:'سالمون مشوي مع نيوكي.', price:60, sale:null, available:true },
+  { id:29, cat:'mains', name:'صدر دجاج', desc:'صدر مشوي، بطاطا حلوة مع الخضار.', price:55, sale:null, available:true },
+  // DESSERTS
+  { id:30, cat:'desserts', name:'تيراميسو', desc:'الحلوى الإيطالية الكلاسيكية بالمسكاربوني والقهوة وبيسكويت السافويارد.', price:18, sale:null, available:true },
+  // DRINKS
+  { id:31, cat:'drinks', name:'اسبريسو', desc:'قهوة إيطالية أصيلة.', price:7, sale:null, available:true },
+  { id:32, cat:'drinks', name:'أمريكانو', desc:'قهوة أمريكانو.', price:7, sale:null, available:true },
+  { id:33, cat:'drinks', name:'صودا', desc:'مشروب غازي.', price:5, sale:null, available:true },
+  { id:34, cat:'drinks', name:'كولا', desc:'كوكا كولا باردة.', price:5, sale:null, available:true },
+];
+
+// ===== LOCAL STORAGE =====
+function saveMenuToStorage() {
+  try { localStorage.setItem('bn_menu', JSON.stringify(MENU)); } catch(e) {}
+}
+function loadMenuFromStorage() {
+  try {
+    const saved = localStorage.getItem('bn_menu');
+    if (saved) MENU = JSON.parse(saved);
+  } catch(e) {}
+}
+
+let orders = [];
+let cart = [];
+let currentTable = null;
+let noteTargetIdx = null;
+let editTargetId = null;
+let orderCounter = 1;
+let currentFilter = 'all';
+let loggedIn = false;
+let notifSound = null;
+
+// Init
+window.onload = () => {
+  loadMenuFromStorage();
+  const urlParams = new URLSearchParams(window.location.search);
+  const tableParam = urlParams.get('table');
+  const adminParam = urlParams.get('admin');
+
+  if (tableParam) {
+    currentTable = parseInt(tableParam);
+    document.getElementById('table-num-display').textContent = currentTable;
+    document.getElementById('table-badge').style.display = 'inline-block';
+  }
+
+  renderMenu();
+  renderCatTabs();
+
+  // إذا كان رابط الإدارة فقط يظهر شاشة الدخول
+  if (adminParam === '1') {
+    document.getElementById('login-screen').style.display = 'flex';
+  } else {
+    // الزبون يدخل مباشرة على المنيو بدون كلمة سر
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'none';
+    loggedIn = false;
+    showView('menu');
+  }
+
+  // Demo orders
+  orders = [
+    { id: 1, table: 3, items: [{id:1,name:'بيتزا نابوليتانا',price:35,qty:1,note:''},{id:8,name:'فوتشيني الفريدو',price:30,qty:2,note:'بدون فطر'}], status:'new', time: new Date(Date.now()-5*60000), total:95 },
+    { id: 2, table: 7, items: [{id:27,name:'سمك ليبراك',price:60,qty:1,note:''},{id:15,name:'بورتا سلط',price:40,qty:1,note:''}], status:'preparing', time: new Date(Date.now()-15*60000), total:100 },
+    { id: 3, table: 2, items: [{id:31,name:'اسبريسو',price:7,qty:2,note:''},{id:30,name:'تيراميسو',price:18,qty:1,note:''}], status:'delivered', time: new Date(Date.now()-45*60000), total:32 },
+  ];
+  orderCounter = 4;
+  updateNewOrdersBadge();
+};
+
+// ============================================================
+// LOGIN
+// ============================================================
+function doLogin() {
+  const user = document.getElementById('login-user').value;
+  const pass = document.getElementById('login-pass').value;
+  if (user === 'admin' && pass === '1234') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'flex';
+    loggedIn = true;
+    showView('menu');
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+document.getElementById('login-pass').addEventListener('keyup', e => { if(e.key==='Enter') doLogin(); });
+
+// ============================================================
+// VIEWS
+// ============================================================
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    const ids = ['menu','orders','stats','mgmt','qr'];
+    t.classList.toggle('active', ids[i] === id);
+  });
+  if (id === 'orders') renderOrders();
+  if (id === 'stats') renderStats();
+  if (id === 'mgmt') renderMgmt();
+  if (id === 'qr') renderQR();
+}
+
+// ============================================================
+// MENU RENDER
+// ============================================================
+function renderCatTabs() {
+  const tabs = document.getElementById('cat-tabs');
+  tabs.innerHTML = CATEGORIES.map(c =>
+    `<button class="cat-tab" onclick="scrollToSection('${c.id}',this)">${c.icon} ${c.name}</button>`
+  ).join('');
+  tabs.querySelector('.cat-tab').classList.add('active');
+}
+
+function renderMenu() {
+  const container = document.getElementById('menu-container');
+  container.innerHTML = CATEGORIES.map(cat => {
+    const items = MENU.filter(i => i.cat === cat.id);
+    if (!items.length) return '';
+    return `<div class="menu-section" id="section-${cat.id}">
+      <div class="section-header">
+        <div class="section-icon">${cat.icon}</div>
+        <div class="section-title">${cat.name}</div>
+        <div class="section-divider"></div>
+      </div>
+      <div class="menu-grid">
+        ${items.map(item => renderMenuItem(item)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMenuItem(item) {
+  const priceHtml = item.sale
+    ? `<span class="item-price">${item.sale} ₪ <span class="discount-price">${item.price}</span></span>`
+    : `<span class="item-price">${item.price} <span>₪</span></span>`;
+  return `<div class="menu-item ${item.available ? '' : 'unavailable'}" id="item-card-${item.id}">
+    ${item.sale ? '<div class="item-badge">🏷️ عرض</div>' : ''}
+    <div class="item-name">${item.name}</div>
+    <div class="item-desc">${item.desc}</div>
+    <div class="item-footer">
+      ${priceHtml}
+      <button class="add-btn" onclick="addToCart(${item.id})">+ أضف</button>
+    </div>
+  </div>`;
+}
+
+function scrollToSection(catId, btn) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const el = document.getElementById('section-' + catId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================
+// CART
+// ============================================================
+function addToCart(itemId) {
+  const item = MENU.find(i => i.id === itemId);
+  if (!item) return;
+  const existing = cart.find(c => c.id === itemId && !c.note);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ id: itemId, name: item.name, price: item.sale || item.price, qty: 1, note: '' });
+  }
+  updateCartUI();
+  showToast(`✅ تمت إضافة ${item.name}`);
+}
+
+function updateCartUI() {
+  const total = cart.reduce((s,c) => s + c.price*c.qty, 0);
+  const count = cart.reduce((s,c) => s + c.qty, 0);
+  document.getElementById('cart-count-badge').textContent = count;
+  document.getElementById('cart-total-fab').textContent = `${total} ₪`;
+  const fab = document.getElementById('cart-fab');
+  if (cart.length > 0) fab.classList.add('visible'); else fab.classList.remove('visible');
+  renderCartItems();
+}
+
+function renderCartItems() {
+  const list = document.getElementById('cart-items-list');
+  if (!cart.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-soft)">🛒 السلة فارغة</div>';
+    return;
+  }
+  list.innerHTML = cart.map((item, idx) => `
+    <div class="cart-item">
+      <div style="flex:1">
+        <div class="cart-item-name">${item.name}</div>
+        ${item.note ? `<div class="cart-item-note">📝 ${item.note}</div>` : ''}
+        <button class="note-btn" onclick="openNoteModal(${idx})">
+          ${item.note ? '✏️ تعديل الملاحظة' : '+ إضافة ملاحظة'}
+        </button>
+      </div>
+      <div class="qty-controls">
+        <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+      </div>
+      <div class="cart-item-price">${item.price * item.qty} ₪</div>
+    </div>
+  `).join('');
+  const sub = cart.reduce((s,c) => s + c.price*c.qty, 0);
+  const tax = Math.round(sub * 0.07);
+  const grand = sub + tax;
+  document.getElementById('subtotal-val').textContent = `${sub} ₪`;
+  document.getElementById('grand-total-val').textContent = `${sub} ₪`;
+}
+
+function changeQty(idx, delta) {
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateCartUI();
+}
+
+function openCart() {
+  document.getElementById('cart-panel').classList.add('open');
+  document.getElementById('cart-overlay').classList.add('visible');
+  renderCartItems();
+}
+
+function closeCart() {
+  document.getElementById('cart-panel').classList.remove('open');
+  document.getElementById('cart-overlay').classList.remove('visible');
+}
+
+function openNoteModal(idx) {
+  noteTargetIdx = idx;
+  document.getElementById('note-text').value = cart[idx].note || '';
+  document.getElementById('note-modal').classList.add('visible');
+}
+
+function saveNote() {
+  if (noteTargetIdx !== null) {
+    cart[noteTargetIdx].note = document.getElementById('note-text').value;
+    updateCartUI();
+  }
+  closeModal('note-modal');
+}
+
+function submitOrder() {
+  if (!cart.length) return;
+  const sub = cart.reduce((s,c) => s + c.price*c.qty, 0);
+  const tax = Math.round(sub * 0.07);
+  const order = {
+    id: orderCounter++,
+    table: currentTable || Math.floor(Math.random()*10)+1,
+    items: cart.map(c => ({...c})),
+    status: 'new',
+    time: new Date(),
+    total: sub,
+    subtotal: sub,
+    tax: 0
+  };
+  orders.unshift(order);
+
+  // بناء رسالة واتساب
+  let msg = '🍕 *طلب جديد - Bella Napoli*\n';
+  msg += '━━━━━━━━━━━━━━━\n';
+  msg += '🪑 *الطاولة:* ' + order.table + '\n';
+  msg += '🧾 *رقم الطلب:* #' + String(order.id).padStart(3,'0') + '\n';
+  msg += '🕐 *الوقت:* ' + new Date().toLocaleTimeString('ar') + '\n';
+  msg += '━━━━━━━━━━━━━━━\n';
+  order.items.forEach(function(item) {
+    msg += '▪️ ' + item.name + ' × ' + item.qty + ' = ' + (item.price * item.qty) + ' ₪\n';
+    if (item.note) msg += '   📝 ' + item.note + '\n';
+  });
+  msg += '━━━━━━━━━━━━━━━\n';
+  msg += '💰 المجموع: ' + sub + ' ₪\n';
+  msg += '✅ *الإجمالي: ' + sub + ' ₪*';
+
+  cart = [];
+  updateCartUI();
+  closeCart();
+
+  // إرسال الطلب عبر واتساب
+  window.location.href = 'whatsapp://send?phone=972597460001&text=' + encodeURIComponent(msg);
+
+  document.getElementById('success-order-num').textContent = '#' + String(order.id).padStart(3,'0');
+  document.getElementById('order-success').classList.add('show');
+  updateNewOrdersBadge();
+  playNotifSound();
+}
+
+function closeSuccess() {
+  document.getElementById('order-success').classList.remove('show');
+}
+
+// ============================================================
+// ORDERS
+// ============================================================
+const STATUS_LABELS = { new:'جديد', preparing:'قيد التحضير', ready:'جاهز', delivered:'تم التسليم', cancelled:'ملغي' };
+const STATUS_ACTIONS = {
+  new: ['accept','reject'],
+  preparing: ['ready'],
+  ready: ['deliver'],
+  delivered: [],
+  cancelled: []
+};
+
+function renderOrders() {
+  const list = document.getElementById('orders-list');
+  const filtered = currentFilter === 'all' ? orders : orders.filter(o => o.status === currentFilter);
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--gray-soft)">لا توجد طلبات</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(o => `
+    <div class="order-card status-${o.status}" id="order-card-${o.id}">
+      <div class="order-header">
+        <div>
+          <div class="order-id">🧾 طلب #${String(o.id).padStart(3,'0')} — طاولة ${o.table}</div>
+          <div class="order-meta">🕐 ${formatTime(o.time)}</div>
+        </div>
+        <span class="status-badge ${o.status}">${STATUS_LABELS[o.status]}</span>
+      </div>
+      <div class="order-items-list">
+        ${o.items.map(i => `
+          <div class="order-line">
+            <span>${i.name} × ${i.qty}</span>
+            <span>${i.price * i.qty} ₪</span>
+          </div>
+          ${i.note ? `<div class="order-note-line">📝 ${i.note}</div>` : ''}
+        `).join('')}
+      </div>
+      <div class="order-total-row"><span>المجموع النهائي</span><span>${o.total} ₪</span></div>
+      <div class="order-actions">
+        ${getActionButtons(o)}
+        <button class="action-btn print" onclick="printOrder(${o.id})">🖨️ طباعة</button>
+        <button class="action-btn invoice" onclick="showInvoice(${o.id})">🧾 فاتورة</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function getActionButtons(o) {
+  const actions = STATUS_ACTIONS[o.status] || [];
+  return actions.map(a => {
+    if (a==='accept') return `<button class="action-btn accept" onclick="setStatus(${o.id},'preparing')">✅ قبول</button>`;
+    if (a==='reject') return `<button class="action-btn reject" onclick="setStatus(${o.id},'cancelled')">❌ رفض</button>`;
+    if (a==='ready') return `<button class="action-btn ready" onclick="setStatus(${o.id},'ready')">✔ جاهز</button>`;
+    if (a==='deliver') return `<button class="action-btn deliver" onclick="setStatus(${o.id},'delivered')">🛵 تسليم</button>`;
+    return '';
+  }).join('');
+}
+
+function setStatus(orderId, status) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  order.status = status;
+  if (status === 'preparing') {
+    // Auto print after acceptance
+    setTimeout(() => printOrder(orderId), 500);
+  }
+  renderOrders();
+  updateNewOrdersBadge();
+  showToast(`تم تغيير حالة الطلب #${String(orderId).padStart(3,'0')} إلى: ${STATUS_LABELS[status]}`);
+}
+
+function filterOrders(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrders();
+}
+
+function updateNewOrdersBadge() {
+  const count = orders.filter(o => o.status === 'new').length;
+  document.getElementById('new-orders-count').textContent = count;
+  document.getElementById('new-orders-count').style.display = count ? 'inline-block' : 'none';
+}
+
+function formatTime(d) {
+  const diff = Math.floor((Date.now() - d) / 60000);
+  if (diff < 1) return 'الآن';
+  if (diff < 60) return `منذ ${diff} دقيقة`;
+  return d.toLocaleTimeString('ar', { hour:'2-digit', minute:'2-digit' });
+}
+
+// ============================================================
+// PRINT
+// ============================================================
+function printOrder(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  const now = new Date();
+
+  // بناء نص الطباعة لـ RawBT
+  let txt = '';
+  txt += 'Bella Napoli\n';
+  txt += '========================\n';
+  txt += 'Talab: #' + String(order.id).padStart(3,'0') + '\n';
+  txt += 'Tawla: ' + order.table + '\n';
+  txt += now.toLocaleString('ar') + '\n';
+  txt += '------------------------\n';
+  order.items.forEach(i => {
+    txt += i.name + ' x' + i.qty + ' = ' + (i.price*i.qty) + ' NIS\n';
+    if (i.note) txt += '  >> ' + i.note + '\n';
+  });
+  txt += '========================\n';
+  txt += 'Majmou: ' + order.total + ' NIS\n';
+  txt += '========================\n';
+  txt += 'Shukran Bella Napoli!\n\n\n';
+
+  // إرسال للطباعة عبر RawBT
+  const encoded = encodeURIComponent(txt);
+  window.location.href = 'rawbt:' + encoded;
+  
+  showToast('🖨️ جاري الطباعة...');
+  return;
+  
+  const content = `
+    <div style="font-family:monospace;width:280px;padding:10px;font-size:13px;direction:rtl;text-align:right">
+      <div style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">Bella Napoli</div>
+      <div style="text-align:center;border-bottom:1px dashed #000;padding-bottom:8px;margin-bottom:8px">
+        شارع رفيديا الرئيسي
+      </div>
+      <div>طلب رقم: #${String(order.id).padStart(3,'0')}</div>
+      <div>طاولة: ${order.table}</div>
+      <div>التاريخ: ${now.toLocaleDateString('ar')}</div>
+      <div>الوقت: ${now.toLocaleTimeString('ar')}</div>
+      <div style="border-top:1px dashed #000;border-bottom:1px dashed #000;margin:8px 0;padding:8px 0">
+        ${order.items.map(i => `
+          <div style="display:flex;justify-content:space-between">
+            <span>${i.name} × ${i.qty}</span>
+            <span>${i.price * i.qty} ₪</span>
+          </div>
+          ${i.note ? `<div style="font-size:11px;color:#666">   📝 ${i.note}</div>` : ''}
+        `).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px"><span>المجموع الفرعي</span><span>${order.subtotal||order.total} ₪</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px"><span>ضريبة 7%</span><span>${order.tax||0} ₪</span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:15px;margin-top:6px"><span>المجموع النهائي</span><span>${order.total} ₪</span></div>
+      <div style="text-align:center;margin-top:12px;font-size:11px">شكراً لزيارتكم 🍕</div>
+    </div>
+  `;
+  const pa = document.getElementById('print-area');
+  pa.innerHTML = content;
+  pa.style.display = 'block';
+  window.print();
+  pa.style.display = 'none';
+}
+
+// ============================================================
+// INVOICE
+// ============================================================
+function showInvoice(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  const invNum = 'INV-' + String(order.id).padStart(5,'0');
+  document.getElementById('invoice-content').innerHTML = `
+    <div class="invoice-header">
+      <div class="invoice-logo-text">Bella Napoli</div>
+      <div style="font-size:11px;color:var(--gray-soft)">شارع رفيديا الرئيسي، نابلس</div>
+    </div>
+    <hr class="invoice-divider">
+    <div class="invoice-row"><span>رقم الفاتورة</span><span>${invNum}</span></div>
+    <div class="invoice-row"><span>رقم الطلب</span><span>#${String(order.id).padStart(3,'0')}</span></div>
+    <div class="invoice-row"><span>طاولة</span><span>${order.table}</span></div>
+    <div class="invoice-row"><span>التاريخ</span><span>${order.time.toLocaleDateString('ar')}</span></div>
+    <hr class="invoice-divider">
+    ${order.items.map(i => `
+      <div class="invoice-row">
+        <span>${i.name} × ${i.qty}</span>
+        <span>${i.price * i.qty} ₪</span>
+      </div>
+    `).join('')}
+    <hr class="invoice-divider">
+    <div class="invoice-row"><span>المجموع الفرعي</span><span>${order.subtotal||order.total} ₪</span></div>
+    <div class="invoice-row"><span>ضريبة 7%</span><span>${order.tax||0} ₪</span></div>
+    <div class="invoice-row invoice-total"><span>الإجمالي</span><span>${order.total} ₪</span></div>
+    <div class="invoice-qr"><div id="inv-qr-${order.id}"></div></div>
+    <div style="text-align:center;font-size:11px;color:var(--gray-soft)">شكراً لزيارتكم 🍕</div>
+  `;
+  document.getElementById('invoice-modal').classList.add('visible');
+  setTimeout(() => {
+    const el = document.getElementById('inv-qr-' + order.id);
+    if (el && !el.querySelector('canvas')) {
+      new QRCode(el, { text: invNum, width:80, height:80, colorDark:'#1A1A1A' });
+    }
+  }, 100);
+}
+
+function printInvoice() {
+  const content = document.getElementById('invoice-content').innerHTML;
+  const pa = document.getElementById('print-area');
+  pa.innerHTML = `<div style="font-family:'Cairo',sans-serif;direction:rtl;text-align:right">${content}</div>`;
+  pa.style.display = 'block';
+  window.print();
+  pa.style.display = 'none';
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function renderStats() {
+  const todayOrders = orders.filter(o => isToday(o.time) && o.status !== 'cancelled');
+  const todayRevenue = todayOrders.reduce((s,o) => s+o.total, 0);
+  const monthOrders = orders.filter(o => isThisMonth(o.time) && o.status !== 'cancelled');
+  const monthRevenue = monthOrders.reduce((s,o) => s+o.total, 0);
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${todayOrders.length}</div><div class="stat-label">طلبات اليوم</div></div>
+    <div class="stat-card gold"><div class="stat-value">${todayRevenue} ₪</div><div class="stat-label">مبيعات اليوم</div></div>
+    <div class="stat-card green"><div class="stat-value">${monthOrders.length}</div><div class="stat-label">طلبات الشهر</div></div>
+    <div class="stat-card blue"><div class="stat-value">${monthRevenue} ₪</div><div class="stat-label">مبيعات الشهر</div></div>
+  `;
+
+  // Daily chart (last 7 days demo)
+  const dayLabels = ['الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'];
+  const dayCounts = [4,7,5,9,12,15,orders.filter(o=>o.status!=='cancelled').length];
+  const maxVal = Math.max(...dayCounts);
+  document.getElementById('daily-chart').innerHTML = dayCounts.map((v,i) => `
+    <div class="bar-item">
+      <div style="font-size:10px;font-weight:700;color:var(--crimson)">${v}</div>
+      <div class="bar" style="height:${Math.max(8,(v/maxVal)*90)}px"></div>
+      <div class="bar-label">${dayLabels[i]}</div>
+    </div>
+  `).join('');
+
+  // Top items
+  const itemCounts = {};
+  orders.filter(o=>o.status!=='cancelled').forEach(o => o.items.forEach(i => {
+    itemCounts[i.name] = (itemCounts[i.name]||0) + i.qty;
+  }));
+  const topItems = Object.entries(itemCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('top-items').innerHTML = topItems.length
+    ? topItems.map(([name,count],i) => `
+      <div class="top-item">
+        <div class="top-item-rank">${i+1}</div>
+        <div class="top-item-name">${name}</div>
+        <div class="top-item-count">${count} مرة</div>
+      </div>`).join('')
+    : '<div style="color:var(--gray-soft);font-size:13px;padding:10px">لا توجد بيانات بعد</div>';
+
+  // Top categories
+  const catCounts = {};
+  orders.filter(o=>o.status!=='cancelled').forEach(o => o.items.forEach(i => {
+    const menuItem = MENU.find(m => m.id === i.id);
+    if (menuItem) {
+      const cat = CATEGORIES.find(c => c.id === menuItem.cat);
+      if (cat) catCounts[cat.name] = (catCounts[cat.name]||0) + i.qty;
+    }
+  }));
+  const topCats = Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('top-cats').innerHTML = topCats.length
+    ? topCats.map(([name,count],i) => `
+      <div class="top-item">
+        <div class="top-item-rank">${i+1}</div>
+        <div class="top-item-name">${name}</div>
+        <div class="top-item-count">${count}</div>
+      </div>`).join('')
+    : '<div style="color:var(--gray-soft);font-size:13px;padding:10px">لا توجد بيانات بعد</div>';
+}
+
+function isToday(d) {
+  const today = new Date();
+  return d.getDate()===today.getDate() && d.getMonth()===today.getMonth() && d.getFullYear()===today.getFullYear();
+}
+function isThisMonth(d) {
+  const today = new Date();
+  return d.getMonth()===today.getMonth() && d.getFullYear()===today.getFullYear();
+}
+
+function exportExcel() { showToast('📥 جاري تصدير ملف Excel...'); }
+function exportPDF() { showToast('📄 جاري تصدير ملف PDF...'); }
+
+// ============================================================
+// MENU MANAGEMENT
+// ============================================================
+function renderMgmt() {
+  const search = document.getElementById('mgmt-search').value.toLowerCase();
+  const catFilter = document.getElementById('mgmt-cat-filter').value;
+
+  // Populate cat filter
+  const select = document.getElementById('mgmt-cat-filter');
+  if (select.options.length === 1) {
+    CATEGORIES.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id; opt.textContent = c.name;
+      select.appendChild(opt);
+    });
+  }
+
+  const filtered = MENU.filter(i => {
+    const matchSearch = i.name.toLowerCase().includes(search) || i.desc.toLowerCase().includes(search);
+    const matchCat = catFilter === 'all' || i.cat === catFilter;
+    return matchSearch && matchCat;
+  });
+
+  document.getElementById('mgmt-list').innerHTML = filtered.map(item => {
+    const cat = CATEGORIES.find(c => c.id === item.cat);
+    return `<div class="mgmt-item">
+      <div class="mgmt-item-info">
+        <div class="mgmt-item-name">${item.name}</div>
+        <div class="mgmt-item-cat">${cat ? cat.icon + ' ' + cat.name : ''}</div>
+      </div>
+      <div class="mgmt-item-price">${item.price} ₪</div>
+      <div class="mgmt-actions">
+        <button class="icon-btn edit" onclick="openEditItem(${item.id})" title="تعديل">✏️</button>
+        <button class="availability-toggle ${item.available?'on':''}" onclick="toggleAvailability(${item.id})" title="${item.available?'إخفاء':'إظهار'}"></button>
+        <button class="icon-btn del" onclick="deleteItem(${item.id})" title="حذف">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAvailability(id) {
+  const item = MENU.find(i => i.id === id);
+  if (item) {
+    item.available = !item.available;
+    saveMenuToStorage();
+    renderMgmt();
+    renderMenu();
+    showToast(item.available ? `✅ ${item.name} متاح الآن` : `❌ ${item.name} غير متاح`);
+  }
+}
+
+function deleteItem(id) {
+  if (!confirm('هل أنت متأكد من حذف هذا الصنف؟')) return;
+  MENU = MENU.filter(i => i.id !== id);
+  saveMenuToStorage();
+  renderMgmt();
+  renderMenu();
+  showToast('🗑️ تم حذف الصنف');
+}
+
+function openAddItem() {
+  editTargetId = null;
+  document.getElementById('edit-modal-title').textContent = '+ إضافة صنف جديد';
+  document.getElementById('edit-name').value = '';
+  document.getElementById('edit-price').value = '';
+  document.getElementById('edit-desc').value = '';
+  document.getElementById('edit-sale').value = '';
+  populateEditCats();
+  document.getElementById('edit-modal').classList.add('visible');
+}
+
+function openEditItem(id) {
+  const item = MENU.find(i => i.id === id);
+  if (!item) return;
+  editTargetId = id;
+  document.getElementById('edit-modal-title').textContent = '✏️ تعديل صنف';
+  document.getElementById('edit-name').value = item.name;
+  document.getElementById('edit-price').value = item.price;
+  document.getElementById('edit-desc').value = item.desc;
+  document.getElementById('edit-sale').value = item.sale || '';
+  populateEditCats(item.cat);
+  document.getElementById('edit-modal').classList.add('visible');
+}
+
+function populateEditCats(selected) {
+  const sel = document.getElementById('edit-cat');
+  sel.innerHTML = CATEGORIES.map(c => `<option value="${c.id}" ${c.id===selected?'selected':''}>${c.name}</option>`).join('');
+}
+
+function saveItem() {
+  const name = document.getElementById('edit-name').value.trim();
+  const price = parseFloat(document.getElementById('edit-price').value);
+  const desc = document.getElementById('edit-desc').value.trim();
+  const cat = document.getElementById('edit-cat').value;
+  const sale = parseFloat(document.getElementById('edit-sale').value) || null;
+  if (!name || !price) { showToast('⚠️ يرجى ملء الحقول المطلوبة'); return; }
+  if (editTargetId) {
+    const item = MENU.find(i => i.id === editTargetId);
+    if (item) { item.name=name; item.price=price; item.desc=desc; item.cat=cat; item.sale=sale; }
+  } else {
+    MENU.push({ id: Date.now(), cat, name, desc, price, sale, available: true });
+  }
+  saveMenuToStorage();
+  closeModal('edit-modal');
+  renderMgmt();
+  renderMenu();
+  showToast('💾 تم الحفظ بنجاح');
+}
+
+// ============================================================
+// QR CODES
+// ============================================================
+function renderQR() {
+  const grid = document.getElementById('qr-grid');
+  const baseUrl = window.location.origin + window.location.pathname;
+  grid.innerHTML = '';
+  for (let t = 1; t <= 12; t++) {
+    const url = `${baseUrl}?table=${t}`;
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+    card.innerHTML = `
+      <div class="qr-table-num">🪑 طاولة ${t}</div>
+      <div class="qr-code-area" id="qr-table-${t}"></div>
+      <div class="qr-link">${url}</div>
+      <button class="qr-download" onclick="downloadQR(${t})">⬇️ تحميل</button>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => {
+      new QRCode(document.getElementById('qr-table-' + t), {
+        text: url, width: 120, height: 120, colorDark: '#1A1A1A', colorLight: '#FFFFFF'
+      });
+    }, 50 * t);
+  }
+}
+
+function downloadQR(tableNum) {
+  const el = document.getElementById('qr-table-' + tableNum);
+  const canvas = el.querySelector('canvas');
+  if (!canvas) { showToast('جاري التوليد...'); return; }
+  const a = document.createElement('a');
+  a.download = `bella-napoli-table-${tableNum}.png`;
+  a.href = canvas.toDataURL();
+  a.click();
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('visible');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function playNotifSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523, 659, 784].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
+      osc.start(ctx.currentTime + i * 0.15);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.3);
+    });
+  } catch(e) {}
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('visible');
+  });
+});
+</script>
+</body>
+</html>
